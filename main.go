@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -17,8 +18,8 @@ func main() {
 	http.HandleFunc("/current", current)
 	http.HandleFunc("/next", next)
 	http.HandleFunc("/previous", previous)
-	//port := os.Getenv("PORT")
-	port := "8080"
+	port := os.Getenv("PORT")
+	//port := "8080"
 	log.Println("listen on localhost:", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
