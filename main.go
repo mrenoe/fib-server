@@ -6,7 +6,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"log"
 	"math/big"
-	"sync"
+	//"sync"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 	compress = flag.Bool("compress", false, "Whether to enable transparent response compression")
 )
 
-var mu sync.Mutex
+//var mu sync.Mutex
 var past = make(map[uint]*big.Int, 0)
 var count uint = 0
 
@@ -48,35 +48,35 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 
 func current(ctx *fasthttp.RequestCtx) {
 	ctx.SetContentType("text/html")
-	mu.Lock()
+	//mu.Lock()
 	current := solveFib(count)
 	fmt.Fprintf(ctx, "%s\n", current)
-	mu.Unlock()
+	//mu.Unlock()
 }
 
 func reset(ctx *fasthttp.RequestCtx) {
 	ctx.SetContentType("text/html")
-	mu.Lock()
+	//mu.Lock()
 	count = 0
 	fmt.Fprintf(ctx, "Reset back to 0\n")
-	mu.Unlock()
+	//mu.Unlock()
 }
 
 func next(ctx *fasthttp.RequestCtx) {
 	ctx.SetContentType("text/html")
-	mu.Lock()
+	//mu.Lock()
 	count++
 	current := solveFib(count)
 	fmt.Fprintf(ctx, "fib(%d) -> %s\n", count, current)
-	mu.Unlock()
+	//mu.Unlock()
 }
 
 func previous(ctx *fasthttp.RequestCtx) {
 	ctx.SetContentType("text/html")
-	mu.Lock()
+	//mu.Lock()
 	previous := solveFib(count - 1)
 	fmt.Fprintf(ctx, "%s\n", previous)
-	mu.Unlock()
+	//mu.Unlock()
 }
 
 func solveFib(n uint) string {
