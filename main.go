@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/valyala/fasthttp"
 	"log"
+	"math"
 	"math/big"
 	"sync"
 )
@@ -18,10 +19,10 @@ var (
 var mu sync.Mutex
 
 //This is the cache of past fibonacci instances
-var past = make(map[uint]*big.Int, 0)
+var past = make(map[uint64]*big.Int, 0)
 
 //count is the global counter of where the server is at in calculating fibonacci numbers
-var count uint = 0
+var count uint64 = 0
 
 func main() {
 	flag.Parse()
@@ -71,6 +72,9 @@ func next(ctx *fasthttp.RequestCtx) {
 	mu.Lock()
 	count++
 	current := solveFib(count)
+	if count == math.MaxUint64 {
+		count = 0
+	}
 	fmt.Fprintf(ctx, "fib(%d) -> %s\n", count, current)
 	mu.Unlock()
 }
@@ -82,7 +86,7 @@ func previous(ctx *fasthttp.RequestCtx) {
 	mu.Unlock()
 }
 
-func solveFib(n uint) string {
+func solveFib(n uint64) string {
 	if val, ok := past[n]; ok {
 		//If there's a previous cache hit here, return that
 		//log.Println(val)
@@ -110,7 +114,7 @@ func solveFib(n uint) string {
 		//However if there's no fib(n-1) and fib(n-2), we're going to solve it and store it
 		a := big.NewInt(0)
 		b := big.NewInt(1)
-		var i uint
+		var i uint64
 		for i = 0; i < n; i++ {
 			// Compute the next Fibonacci number, storing it in a.
 			a.Add(a, b)
