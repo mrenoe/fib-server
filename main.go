@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 	"math/big"
+	"os"
 )
 
 var mu sync.Mutex
@@ -17,8 +18,10 @@ func main() {
 	http.HandleFunc("/current", current)
 	http.HandleFunc("/next", next)
 	http.HandleFunc("/previous", previous)
+	port := os.Getenv("PORT")
 
-	log.Fatal(http.ListenAndServe("localhost:8080",nil))
+
+	log.Fatal(http.ListenAndServe(":"+port,nil))
 }
 
 func handler(w http.ResponseWriter, r *http.Request){
