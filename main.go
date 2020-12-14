@@ -18,12 +18,13 @@ func main() {
 	http.HandleFunc("/current", current)
 	http.HandleFunc("/next", next)
 	http.HandleFunc("/previous", previous)
+	http.HandleFunc("/reset", reset)
 	port, ok := os.LookupEnv("PORT")
 	if ok == false || port == "" {
 		port = "8080"
 	}
 
-	log.Println("listen on localhost:" + port)
+	//log.Println("listen on localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
@@ -34,7 +35,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func current(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	current := solveFib(count)
-	fmt.Fprintf(w, "current -> %s\n", current)
+	fmt.Fprintf(w, "%s\n", current)
 	mu.Unlock()
 }
 
@@ -49,21 +50,21 @@ func next(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	count++
 	current := solveFib(count)
-	fmt.Fprintf(w, "next(%d) -> %s\n", count, current)
+	fmt.Fprintf(w, "fib(%d) -> %s\n", count, current)
 	mu.Unlock()
 }
 
 func previous(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	previous := solveFib(count - 1)
-	fmt.Fprintf(w, "previous -> %s\n", previous)
+	fmt.Fprintf(w, "%s\n", previous)
 	mu.Unlock()
 }
 
 func solveFib(n int) string {
 	if val, ok := past[n]; ok {
-		log.Println("Using cache!")
-		log.Println(val) // 100-digit Fibonacci number
+		//log.Println("Using cache!")
+		//log.Println(val) // 100-digit Fibonacci number
 		return val.String()
 	}
 	switch n {
@@ -80,7 +81,7 @@ func solveFib(n int) string {
 			a := new(big.Int)
 
 			a.Add(n1, n2)
-			log.Println("Using additive cache!")
+			//log.Println("Using additive cache!")
 			past[n] = a
 			return a.String()
 		}
@@ -93,7 +94,7 @@ func solveFib(n int) string {
 			// Swap a and b so that b is the next number in the sequence.
 			a, b = b, a
 		}
-		log.Println(a) // 100-digit Fibonacci number
+		//log.Println(a) // 100-digit Fibonacci number
 		past[n] = a
 		return a.String()
 	}
