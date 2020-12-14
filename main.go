@@ -29,13 +29,19 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "This is not a valid endpoint.\nValid endpoints are /current, /next, /previous.")
-	http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
 }
 
 func current(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	current := solveFib(count)
 	fmt.Fprintf(w, "current -> %s\n", current)
+	mu.Unlock()
+}
+
+func reset(w http.ResponseWriter, r *http.Request) {
+	mu.Lock()
+	count = 0
+	fmt.Fprintf(w, "Reset back to 0\n")
 	mu.Unlock()
 }
 
