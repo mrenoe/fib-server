@@ -3,6 +3,7 @@ package main
 import "testing"
 
 func Test_solveFib(t *testing.T) {
+	
 	type args struct {
 		n            int
 	}
@@ -10,14 +11,23 @@ func Test_solveFib(t *testing.T) {
 		name    string
 		args    args
 		want    string
-		wantErr bool
+		
 	}{
 		{name: "Nominal Test",
 			args: args{0},
-			want: "0", wantErr: false},
-		{name: "Fib at 95",
+			want: "0"},
+		{name: "Fib(95)",
 			args: args{95},
-			want: "31940434634990099905", wantErr: false},
+			want: "31940434634990099905"},
+		{name: "Fib(96)",
+			args: args{96},
+			want: "51680708854858323072"},
+		{name: "Additive Cache",
+			args: args{97},
+			want: "83621143489848422977"},
+		{name: "Fib(95) cache",
+			args: args{95},
+			want: "31940434634990099905"},
 
 	}
 
