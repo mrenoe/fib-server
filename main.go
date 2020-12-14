@@ -6,7 +6,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"log"
 	"math/big"
-	//"sync"
+	"sync"
 )
 
 var (
@@ -14,8 +14,13 @@ var (
 	compress = flag.Bool("compress", false, "Whether to enable transparent response compression")
 )
 
-//var mu sync.Mutex
+//Because we're using a global map, we need to mutex lock each write
+var mu sync.Mutex
+
+//This is the cache of past fibonacci instances
 var past = make(map[uint]*big.Int, 0)
+
+//count is the global counter of where the server is at in calculating fibonacci numbers
 var count uint = 0
 
 func main() {
@@ -31,6 +36,7 @@ func main() {
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	//Routes and their handlers
 	switch string(ctx.Path()) {
 	case "/current":
 		current(ctx)
@@ -38,6 +44,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		next(ctx)
 	case "/previous":
 		previous(ctx)
+		//Added reset for development. Will exist behind the scenes for testing purposes
 	case "/reset":
 		reset(ctx)
 	default:
@@ -47,42 +54,38 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 func current(ctx *fasthttp.RequestCtx) {
-	ctx.SetContentType("text/html")
-	//mu.Lock()
+	mu.Lock()
 	current := solveFib(count)
 	fmt.Fprintf(ctx, "%s\n", current)
-	//mu.Unlock()
+	mu.Unlock()
 }
 
 func reset(ctx *fasthttp.RequestCtx) {
-	ctx.SetContentType("text/html")
-	//mu.Lock()
+	mu.Lock()
 	count = 0
 	fmt.Fprintf(ctx, "Reset back to 0\n")
-	//mu.Unlock()
+	mu.Unlock()
 }
 
 func next(ctx *fasthttp.RequestCtx) {
-	ctx.SetContentType("text/html")
-	//mu.Lock()
+	mu.Lock()
 	count++
 	current := solveFib(count)
 	fmt.Fprintf(ctx, "fib(%d) -> %s\n", count, current)
-	//mu.Unlock()
+	mu.Unlock()
 }
 
 func previous(ctx *fasthttp.RequestCtx) {
-	ctx.SetContentType("text/html")
-	//mu.Lock()
+	mu.Lock()
 	previous := solveFib(count - 1)
 	fmt.Fprintf(ctx, "%s\n", previous)
-	//mu.Unlock()
+	mu.Unlock()
 }
 
 func solveFib(n uint) string {
 	if val, ok := past[n]; ok {
-		//log.Println("Using cache!")
-		log.Println(val) //  Fibonacci number
+		//If there's a previous cache hit here, return that
+		//log.Println(val)
 		return val.String()
 	}
 	switch n {
@@ -93,6 +96,7 @@ func solveFib(n uint) string {
 		past[n] = big.NewInt(1)
 		return "1"
 	default:
+		//If there's a past instance of n-1 or n-2, use those rather than adding from 0 each time
 		n1 := past[n-1]
 		n2 := past[n-2]
 		if n1 != nil && n2 != nil {
@@ -103,6 +107,7 @@ func solveFib(n uint) string {
 			past[n] = a
 			return a.String()
 		}
+		//However if there's no fib(n-1) and fib(n-2), we're going to solve it and store it
 		a := big.NewInt(0)
 		b := big.NewInt(1)
 		var i uint
@@ -112,7 +117,7 @@ func solveFib(n uint) string {
 			// Swap a and b so that b is the next number in the sequence.
 			a, b = b, a
 		}
-		log.Println(a) // 100-digit Fibonacci number
+		//And place it in the cache
 		past[n] = a
 		return a.String()
 	}
