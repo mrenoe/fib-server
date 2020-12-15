@@ -1,5 +1,25 @@
 # Fib-Server
 
+## Assumptions and Caveats
+* This server uses a global counter to track where the server is at in the fibonacci sequence - this has numeric limits. i.e. for fib(n) = x, n is between 0 and 18446744073709551615 and x is between 0 and 2^63 (machine dependent)
+* Future versions could use a memcache/redis store to maintain sessions and users so that each user can track `fib(n)` separately
+
+## Benchmarks
+Current benchmarks using [`wrk`](https://github.com/wg/wrk):
+Test: `wrk -t12 -c500 -d20s http://<hosted-fib-server>/next`
+```
+Running 20s test @ http://54.157.121.105/next
+  12 threads and 500 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   103.92ms  163.41ms   1.86s    96.19%
+    Req/Sec   312.98    302.56     1.68k    80.59%
+  56910 requests in 20.10s, 331.02MB read
+  Socket errors: connect 251, read 0, write 0, timeout 0
+Requests/sec:   2831.04
+Transfer/sec:     16.47MB
+```
+Given that there are errors, there's certainly places to improve the server infrastructure and likely configuration
+
 ## Fib-Server is a service API that exposes 3 primary endpoints:
 `/current`
 Returns the current number in the servers fibonacci sequence
