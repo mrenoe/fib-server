@@ -8,7 +8,7 @@
 Current benchmarks using [`wrk`](https://github.com/wg/wrk):
 Test: `wrk -t12 -c500 -d20s http://<hosted-fib-server>/next`
 ```
-Running 20s test @ http://54.157.121.105/next
+Running 20s test @ http://<hosted-fib-server>/next
   12 threads and 500 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
     Latency   103.92ms  163.41ms   1.86s    96.19%
