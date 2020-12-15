@@ -15,7 +15,7 @@ Returns the next number in the fibonacci sequence from current and increments th
 ## Deploying
 
 ### Binary
-This is designed to run on linux machine with 512mb RAM and 1 CPU and the `dist/` folder contains a binary ready to be deployed in that way
+This is designed to run on linux machine with 512mb RAM, 1 CPU, and port 80 open to HTTP traffic. The `dist/` folder contains a binary ready to be deployed in that way.
 
 
 ### Source Build
